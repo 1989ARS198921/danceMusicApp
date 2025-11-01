@@ -6,43 +6,55 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dancemusicapp.local.Lesson
-import com.example.dancemusicapp.R // Убедись, что импорт ресурсов правильный
+import com.example.dancemusicapp.R
+import com.example.dancemusicapp.local.Lesson // Убедись, что импорт правильный
 
 class LessonAdapter(
     private var lessonList: MutableList<Lesson> = mutableListOf() // Используем MutableList
-    // ... другие параметры, например, слушатель
 ) : RecyclerView.Adapter<LessonAdapter.LessonViewHolder>() {
 
-    // Метод для обновления списка
+    // Метод для обновления всего списка
     fun updateList(newList: List<Lesson>) {
         lessonList.clear()
         lessonList.addAll(newList)
-        notifyDataSetChanged() // Неэффективно для больших списков, лучше использовать ListAdapter
+        notifyDataSetChanged()
     }
 
-    // ... (остальной код: onCreateViewHolder, onBindViewHolder, getItemCount, LessonViewHolder)
+    // === Добавь этот метод ===
+    /**
+     * Добавляет одно занятие в конец списка.
+     *
+     * @param lesson Новое занятие для добавления.
+     */
+    fun addItem(lesson: Lesson) {
+        val position = lessonList.size
+        lessonList.add(lesson)
+        notifyItemInserted(position)
+    }
+    // =========================
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LessonViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_lesson, parent, false) // Убедись, что item_lesson.xml существует
+            .inflate(R.layout.item_lesson, parent, false)
         return LessonViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: LessonViewHolder, position: Int) {
-        holder.bind(lessonList[position]) // ... или передай слушатель
+        holder.bind(lessonList[position])
     }
 
     override fun getItemCount(): Int = lessonList.size
 
     class LessonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val title: TextView = itemView.findViewById(R.id.lessonTitle) // Убедись, что ID правильный
+        private val title: TextView = itemView.findViewById(R.id.lessonTitle)
         private val date: TextView = itemView.findViewById(R.id.lessonDate)
         private val description: TextView = itemView.findViewById(R.id.lessonDescription)
 
         fun bind(lesson: Lesson) {
             title.text = lesson.title
-            // ... форматирование даты и установка в date.text
-            date.text = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date(lesson.timestamp))
+            // Форматирование даты
+            date.text = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
+                .format(java.util.Date(lesson.timestamp))
             description.text = lesson.description
         }
     }

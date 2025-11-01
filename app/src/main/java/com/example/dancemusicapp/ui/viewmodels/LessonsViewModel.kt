@@ -1,10 +1,10 @@
 // LessonsViewModel.kt
-package com.example.dancemusicapp.ui.viewmodels // <-- Новое место
+package com.example.dancemusicapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dancemusicapp.local.Lesson // <-- Импорт модели
-import com.example.dancemusicapp.repository.LessonRepository // <-- Импорт Repository
+import com.example.dancemusicapp.local.Lesson // Убедись, что путь правильный
+import com.example.dancemusicapp.repository.LessonRepository // Убедись, что путь правильный
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,9 +13,9 @@ import kotlinx.coroutines.launch
 
 // UI-состояние для занятий
 data class LessonsUiState(
-    val lessons: List<Lesson> = emptyList(), // Список занятий
-    val isLoading: Boolean = false,          // Флаг загрузки
-    val error: String? = null               // Ошибка
+    val lessons: List<Lesson> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
 )
 
 class LessonsViewModel(
@@ -26,53 +26,46 @@ class LessonsViewModel(
     val uiState: StateFlow<LessonsUiState> = _uiState.asStateFlow()
 
     init {
-        // Начинаем наблюдать за изменениями в базе данных через Repository
-        // и обновляем UI-состояние
+        loadLessons()
+    }
+
+    private fun loadLessons() {
         viewModelScope.launch {
-            lessonRepository.getAllLessons().collect { lessons ->
-                _uiState.update { it.copy(lessons = lessons, isLoading = false, error = null) }
+            try {
+                // Предполагается, что lessonRepository.getAllLessons() возвращает Flow<List<Lesson>>
+                lessonRepository.getAllLessons().collect { lessons ->
+                    _uiState.update { it.copy(lessons = lessons, isLoading = false, error = null) }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message) }
             }
         }
     }
 
+    fun addLesson(lesson: Lesson) {
+        viewModelScope.launch {
+            try {
+                lessonRepository.insertLesson(lesson)
+                // loadLessons() вызывать не обязательно, Flow обновит список
+            } catch (e: Exception) {
+                // Обработка ошибки (например, логирование или обновление UI-состояния ошибки)
+                _uiState.update { it.copy(error = e.message) }
+            }
+        }
+    }
+
+    // Оставим addTestLesson для кнопки "Записаться на занятие"
     fun addTestLesson() {
         viewModelScope.launch {
             try {
                 val testLesson = Lesson(
+                    // id = 0, // ID будет сгенерирован Room
                     title = "Тестовое занятие",
                     description = "Это тестовая запись.",
                     timestamp = System.currentTimeMillis(),
                     durationMinutes = 30
                 )
                 lessonRepository.insertLesson(testLesson)
-                // Обработка ошибки не обязательна здесь, так как Flow обновит список автоматически
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) } // Обновляем состояние ошибки
-            }
-        }
-    }
-
-    fun addLesson(title: String, description: String, timestamp: Long, durationMinutes: Int) {
-        viewModelScope.launch {
-            try {
-                val newLesson = Lesson(
-                    title = title,
-                    description = description,
-                    timestamp = timestamp,
-                    durationMinutes = durationMinutes
-                )
-                lessonRepository.insertLesson(newLesson)
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
-            }
-        }
-    }
-
-    fun deleteLesson(lesson: Lesson) {
-        viewModelScope.launch {
-            try {
-                lessonRepository.deleteLesson(lesson)
-                // Обработка ошибки не обязательна, Flow обновит список
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message) }
             }
