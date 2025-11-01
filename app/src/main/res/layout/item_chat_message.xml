@@ -5,21 +5,21 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/messageSender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#888"
-        android:layout_gravity="end" />
-
+    <!-- TextView для текста сообщения -->
     <TextView
         android:id="@+id/messageText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:padding="12dp"
-        android:background="#e0e0e0"
+        android:layout_marginBottom="4dp" />
+
+    <!-- TextView для указания отправителя (Бот / Вы) -->
+    <TextView
+        android:id="@+id/messageSender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textStyle="italic"
         android:layout_gravity="end" />
 
 </LinearLayout>

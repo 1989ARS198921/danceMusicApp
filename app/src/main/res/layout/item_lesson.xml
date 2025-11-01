@@ -3,32 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#f5f5f5"
-    android:layout_margin="8dp"
-    android:clipToPadding="false">
+    android:padding="8dp">
 
+    <!-- TextView для названия занятия -->
     <TextView
         android:id="@+id/lessonTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
 
+    <!-- TextView для даты и времени занятия -->
     <TextView
         android:id="@+id/lessonDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textColor="#888"
-        android:layout_marginTop="4dp" />
+        android:layout_marginBottom="4dp" />
 
+    <!-- TextView для описания занятия -->
     <TextView
         android:id="@+id/lessonDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666"
-        android:layout_marginTop="4dp" />
+        android:textSize="14sp" />
 
 </LinearLayout>

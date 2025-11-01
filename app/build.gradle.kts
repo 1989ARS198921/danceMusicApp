@@ -42,7 +42,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1") // Убедимся, что версия 2.6.1
     implementation("androidx.room:room-ktx:2.6.1") // для использования с Kotlin Coroutines
     ksp("androidx.room:room-compiler:2.6.1") // KSP для генерации кода, используем функцию ksp()
-
+    implementation("androidx.fragment:fragment-ktx:1.8.4")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
