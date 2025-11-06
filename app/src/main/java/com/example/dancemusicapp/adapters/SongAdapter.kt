@@ -1,28 +1,34 @@
 // SongAdapter.kt
-package com.example.dancemusicapp.adapters // Убедись, что пакет правильный
+package com.example.dancemusicapp.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter // <-- Наследуемся от ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dancemusicapp.R
-import com.example.dancemusicapp.Song // Убедись, что импорт правильный
+import com.example.dancemusicapp.Song
+
+// Callback для ListAdapter, чтобы он понимал, как сравнивать элементы
+class SongDiffCallback : DiffUtil.ItemCallback<Song>() {
+    override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Song, newItem: Song): Boolean {
+        return oldItem == newItem
+    }
+}
 
 class SongAdapter(
-    private var songList: MutableList<Song> = mutableListOf(), // Используем MutableList для возможности изменения
     private val onItemClick: (Song) -> Unit
-) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
+) : ListAdapter<Song, SongAdapter.SongViewHolder>(SongDiffCallback()) {
 
-    inner class SongViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val title: TextView = view.findViewById(R.id.title)
-        private val artist: TextView = view.findViewById(R.id.artist)
-
-        fun bind(song: Song) {
-            title.text = song.title
-            artist.text = song.artist
-            itemView.setOnClickListener { onItemClick(song) }
-        }
+    // Метод для обновления списка (для ListAdapter используется submitList)
+    fun updateList(newList: List<Song>) {
+        submitList(newList) // ListAdapter использует submitList
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -31,24 +37,18 @@ class SongAdapter(
         return SongViewHolder(view)
     }
 
-    override fun getItemCount(): Int = songList.size
-
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        holder.bind(songList[position])
+        holder.bind(getItem(position), onItemClick)
     }
 
-    // === Добавляем метод updateList ===
-    /**
-     * Обновляет список песен в адаптере.
-     *
-     * @param newList Новый список песен для отображения.
-     */
-    fun updateList(newList: List<Song>) {
-        songList.clear()
-        songList.addAll(newList)
-        notifyDataSetChanged() // Уведомляем адаптер об изменениях.
-        // Примечание: notifyDataSetChanged() неэффективен для больших списков.
-        // Для лучшей производительности рассмотрите использование ListAdapter с DiffUtil.
+    class SongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val title: TextView = itemView.findViewById(R.id.title)
+        private val artist: TextView = itemView.findViewById(R.id.artist)
+
+        fun bind(song: Song, onItemClick: (Song) -> Unit) {
+            title.text = song.title
+            artist.text = song.artist
+            itemView.setOnClickListener { onItemClick(song) }
+        }
     }
-    // ================================
 }

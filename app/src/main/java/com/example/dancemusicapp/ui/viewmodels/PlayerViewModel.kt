@@ -1,11 +1,19 @@
 // PlayerViewModel.kt
 package com.example.dancemusicapp.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dancemusicapp.Song
-import kotlinx.coroutines.flow.* // <-- Импортируем все необходимые элементы из kotlinx.coroutines.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
+
+// UI-состояние для плеера
 data class PlayerUiState(
     val songs: List<Song> = emptyList(),
     val currentSong: Song? = null,
@@ -13,25 +21,25 @@ data class PlayerUiState(
     // ... другие поля
 )
 
-class PlayerViewModel : ViewModel() {
+// Меняем наследование с ViewModel на AndroidViewModel
+class PlayerViewModel(
+    application: Application // <-- Принимаем Application
+) : AndroidViewModel(application) { // <-- Наследуемся от AndroidViewModel
 
     private val _uiState = MutableStateFlow(PlayerUiState())
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
-    // Если ты хочешь отдельный StateFlow для песен
-    // Теперь map, SharingStarted, stateIn будут найдены благодаря import kotlinx.coroutines.flow.*
+    // Свойство для потока песен (если нужно отдельно)
     val songsState: StateFlow<List<Song>> = _uiState.map { it.songs }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000), // 5 секунд
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
-    // ... другие методы
-
-    // --- Добавь недостающие методы, которые вызываются из PlayerFragment ---
+    // Методы для управления плеером
     fun playSong(path: String) {
-        // TODO: Реализовать логику воспроизведения песни по пути path
-        // Например, обновить _uiState, чтобы currentSong = ..., isPlaying = true
+        // Логика воспроизведения песни по пути path
+        // Например, обновление _uiState, чтобы currentSong = ..., isPlaying = true
         _uiState.value = _uiState.value.copy(
             currentSong = _uiState.value.songs.find { it.path == path }, // Пример поиска
             isPlaying = true
@@ -39,18 +47,18 @@ class PlayerViewModel : ViewModel() {
     }
 
     fun play() {
-        // TODO: Реализовать продолжение воспроизведения
+        // Логика продолжения воспроизведения
         _uiState.value = _uiState.value.copy(isPlaying = true)
     }
 
     fun pause() {
-        // TODO: Реализовать паузу
+        // Логика паузы
         _uiState.value = _uiState.value.copy(isPlaying = false)
     }
 
     fun stop() {
-        // TODO: Реализовать остановку
+        // Логика остановки
         _uiState.value = _uiState.value.copy(isPlaying = false, currentSong = null)
     }
-    // --- Конец добавленных методов ---
+    // ... остальные методы ...
 }

@@ -7,6 +7,7 @@ import androidx.fragment.app.commit // Импорт для FragmentManager.commi
 import androidx.fragment.app.replace
 import com.example.dancemusicapp.local.AppDatabase // <-- Импорт AppDatabase
 import com.example.dancemusicapp.repository.LessonRepository // <-- Импорт Repository
+import com.example.dancemusicapp.ui.fragments.ChatFragment
 import com.example.dancemusicapp.ui.fragments.LessonsFragment // <-- Импорт фрагмента
 
 // Если используется Dependency Injection (например, Hilt), база и репозитории
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
                 setReorderingAllowed(true) // Позволяет оптимизировать операции
                 // Заменяем содержимое контейнера (FrameLayout с id fragment_container)
                 // на новый экземпляр LessonsFragment
-                replace<LessonsFragment>(R.id.fragment_container)
+                replace<ChatFragment>(R.id.fragment_container)
             }
         }
     }

@@ -28,7 +28,7 @@
 
     </LinearLayout>
 
-    <!-- FloatingActionButton добавлена сюда -->
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddLesson"
         android:layout_width="wrap_content"

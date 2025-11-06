@@ -1,12 +1,12 @@
 // Lesson.kt
-package com.example.dancemusicapp.local // <-- Новое место (ранее мог быть в корне или в models)
+package com.example.dancemusicapp.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "lessons") // Указываем имя таблицы
+@Entity(tableName = "lessons")
 data class Lesson(
-    @PrimaryKey(autoGenerate = true) // Автогенерируемый ID
+    @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val title: String,
     val description: String,

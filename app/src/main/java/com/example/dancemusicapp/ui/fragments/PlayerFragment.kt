@@ -1,5 +1,5 @@
 // PlayerFragment.kt
-package com.example.dancemusicapp.ui.fragments // <-- Новое место
+package com.example.dancemusicapp.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,20 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider // <-- Добавь этот import
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dancemusicapp.adapters.SongAdapter // <-- Импорт адаптера
-import com.example.dancemusicapp.R // <-- Импорт ресурсов
-import com.example.dancemusicapp.ui.viewmodels.PlayerViewModel // <-- Импорт ViewModel
+import com.example.dancemusicapp.adapters.SongAdapter
+import com.example.dancemusicapp.R
+import com.example.dancemusicapp.ui.viewmodels.PlayerViewModel
+import com.example.dancemusicapp.ui.viewmodels.PlayerViewModelFactory // <-- Добавь этот import
 import kotlinx.coroutines.launch
 
 class PlayerFragment : Fragment() {
 
-    private val viewModel: PlayerViewModel by viewModels()
+    // Убираем lazy initialization viewModel здесь, инициализируем в onViewCreated
+    private lateinit var viewModel: PlayerViewModel
     private lateinit var adapter: SongAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var btnPlay: Button
@@ -32,8 +34,7 @@ class PlayerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Замените на имя вашего макета
-        return inflater.inflate(R.layout.fragment_player, container, false)
+        return inflater.inflate(R.layout.fragment_player, container, false) // Убедись, что layout существует
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +52,16 @@ class PlayerFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false) // Горизонтальный, если нужно
         recyclerView.adapter = adapter
 
+        // --- ИНИЦИАЛИЗАЦИЯ PlayerViewModel ЧЕРЕЗ FACTORY ---
+        viewModel = ViewModelProvider(
+            this,
+            PlayerViewModelFactory.create(
+                requireActivity().application // <-- Передаём Application
+                // null // <-- Передаём PlayerRepository (если нужно и создано), или PlayerRepository()
+            )
+        )[PlayerViewModel::class.java]
+        // --- КОНЕЦ ИНИЦИАЛИЗАЦИИ ---
+
         btnPlay.setOnClickListener { viewModel.play() }
         btnPause.setOnClickListener { viewModel.pause() }
         btnStop.setOnClickListener { viewModel.stop() }
@@ -60,12 +71,11 @@ class PlayerFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // Пример: наблюдение за списком песен
                 viewModel.songsState.collect { songs ->
-                    // adapter.submitList(songs) // Если ListAdapter
-                    adapter.updateList(songs) // Если стандартный Adapter
+                    adapter.updateList(songs) // <-- Теперь вызов updateList работает
                 }
 
                 // Пример: наблюдение за состоянием воспроизведения (isPlaying, currentSong и т.д.)
-                // viewModel.playerState.collect { state ->
+                // viewModel.uiState.collect { state ->
                 //     btnPlay.isEnabled = !state.isPlaying
                 //     btnPause.isEnabled = state.isPlaying
                 //     // Обновить UI текущей песни

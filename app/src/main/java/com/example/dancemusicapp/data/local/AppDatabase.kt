@@ -1,28 +1,18 @@
 // AppDatabase.kt
-package com.example.dancemusicapp.local // <-- Новое место (ранее мог быть в корне)
+package com.example.dancemusicapp.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-
-// Миграция (пример: с версии 1 на 2)
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        // Пример: добавить новый столбец
-        // database.execSQL("ALTER TABLE lessons ADD COLUMN new_column TEXT DEFAULT '' NOT NULL")
-    }
-}
 
 @Database(
-    entities = [Lesson::class], // Указываем сущности
-    version = 2,                // Увеличиваем версию
-    exportSchema = false        // Удобно для разработки, но в продакшене лучше true
+    entities = [Lesson::class],
+    version = 2, // Увеличена версия
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun lessonDao(): LessonDao // Метод для получения DAO
+    abstract fun lessonDao(): LessonDao
 
     companion object {
         @Volatile
@@ -35,8 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "app_database"
                 )
-                    .addMigrations(MIGRATION_1_2) // Добавляем миграцию
-                    // .fallbackToDestructiveMigration() // <-- Можно убрать, если добавили миграцию
+                    .fallbackToDestructiveMigration() // <-- Временное решение
                     .build()
                 INSTANCE = instance
                 instance
